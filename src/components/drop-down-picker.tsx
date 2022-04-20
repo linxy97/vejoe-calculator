@@ -9,7 +9,7 @@ import { TextField, Typography } from '@mui/material';
 import LiquidityAddInput from './liquidity-add-input';
 import { useDispatch } from 'react-redux';
 import { calculatorSlice } from '../redux/calculatorSlice';
-import { COIN_API, PAIR_API, PMCJ_API } from '../api/web3-api';
+import { COIN_API, PAIR_API, PMCJ_API, TOKEN_ORACLE_API } from '../api/web3-api';
 
 export const DropDownPicker = () => {
     const dispatch = useDispatch();
@@ -27,10 +27,13 @@ export const DropDownPicker = () => {
                     const lpToken = value.lpToken;
                     PAIR_API.fetchAll(value.lpToken).then(value => {
                         dispatch(calculatorSlice.actions.setPair(JSON.stringify(value)));
-                        console.log(value.token0)
                         COIN_API.getCoinInfos(lpToken, value.token0, value.token1).then( value => {
                             dispatch(calculatorSlice.actions.setTokens(value));
                         });
+                        // console.log(farm)
+                        const [farm1, farm2] = FARMS[event.target.value];
+                        TOKEN_ORACLE_API.getTokenPriceInUSD(farm1).then(value => {dispatch(calculatorSlice.actions.setOracleToken0(Number(value)))});
+                        TOKEN_ORACLE_API.getTokenPriceInUSD(farm2).then(value => {dispatch(calculatorSlice.actions.setOracleToken1(Number(value)))});
                     });
                   }
               );

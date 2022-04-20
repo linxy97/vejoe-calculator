@@ -10,8 +10,10 @@ type stateType = {
     totalAllocPoint: any;
     pair: any,
     token0: any,
-    token1: any
-
+    token1: any,
+    oracleToken0: any,
+    oracleToken1: any,
+    oracleTokenJoe: any,
 } 
 const initialState: stateType = {
     farm: -1,
@@ -23,7 +25,10 @@ const initialState: stateType = {
     totalAllocPoint: null,
     pair: null,
     token0: null,
-    token1: null
+    token1: null,
+    oracleToken0: null,
+    oracleToken1: null,
+    oracleTokenJoe: null,
 }
 export const calculatorSlice = createSlice({
     name: 'calculator',
@@ -53,6 +58,15 @@ export const calculatorSlice = createSlice({
             console.log(action);
             if (!action.payload) {state.token0 = null; state.token1 = null;}
             else {state.token0 = action.payload.token0; state.token1 = action.payload.token1;}
+        },
+        setOracleToken0: (state, action: PayloadAction<any>) => {
+            state.oracleToken0 = action.payload;
+        },
+        setOracleToken1: (state, action: PayloadAction<any>) => {
+            state.oracleToken1 = action.payload;
+        },
+        setOracleTokenJoe: (state, action: PayloadAction<any>) => {
+            state.oracleTokenJoe = action.payload;
         },
     }
 })

@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { getTokenSourceMapRange } from 'typescript';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
+import { PRICE_ORACLE_ADDRESS } from '../constants/constants';
 
 const CONSTANTS = {
     NODE_URL: 'https://api.avax.network/ext/bc/C/rpc',
@@ -203,6 +205,46 @@ export const COIN_API = {
             return coinInfo;
     }
 }
+
+export const TOKEN_ORACLE_API = {
+    getTokenPriceInUSD: async (token: string) => {
+        if (token === 'JOE') {
+            return await TOKEN_ORACLE_API.getJOEToken();
+        }
+        return await TOKEN_ORACLE_API.getToken(token);
+    },
+    getJOEToken: async () => {
+        try {
+            let requestOptions = {
+                method: 'GET',
+                redirect: 'follow'
+              } as any;
+            const result = await fetch("https://api.traderjoexyz.com/priceusd/0x6e84a6216ea6dacc71ee8e6b0a5b7322eebc0fdd", requestOptions)
+                .then(response => response.text())
+                .catch(error => console.log('error', error));
+            console.log(result)
+            return Number(result) * Math.pow(10, -18);
+        } catch (error) {
+            console.error(error)
+        }
+        
+    },
+    getToken: async (token: string) => {
+        const provider = new Web3.providers.HttpProvider('https://cloudflare-eth.com');
+        const web3 = new Web3(provider);
+        const contract = new web3.eth.Contract(PRICE_ORACLE_ADDRESS[token].abi, PRICE_ORACLE_ADDRESS[token].address);
+        let tokenPrice;
+        await contract.methods.latestAnswer().call((err: any, result: any) => {
+            if (err) {
+                console.log(err)
+            } else {
+                tokenPrice = result;
+            };
+        });
+        return tokenPrice * Math.pow(10, -8);
+    },
+}
+
 const initializeWeb3Contract = (contractAbi: AbiItem, address: string) => {
     const provider = new Web3.providers.HttpProvider(CONSTANTS.NODE_URL);
     const web3 = new Web3(provider);
