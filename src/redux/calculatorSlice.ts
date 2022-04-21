@@ -14,7 +14,8 @@ type stateType = {
     oracleToken0: any,
     oracleToken1: any,
     oracleTokenJoe: any,
-} 
+}
+
 const initialState: stateType = {
     farm: -1,
     userLiquidity: null,
@@ -30,6 +31,7 @@ const initialState: stateType = {
     oracleToken1: null,
     oracleTokenJoe: null,
 }
+
 export const calculatorSlice = createSlice({
     name: 'calculator',
     initialState: initialState,

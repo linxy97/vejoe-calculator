@@ -5,11 +5,14 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { FARMS } from '../constants/constants';
-import { TextField, Typography } from '@mui/material';
-import LiquidityAddInput from './liquidity-add-input';
+import { Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { calculatorSlice } from '../redux/calculatorSlice';
-import { COIN_API, PAIR_API, PMCJ_API, TOKEN_ORACLE_API } from '../api/web3-api';
+import { TokenOracleApi } from '../api/price-oracle-api';
+import { CoinApi as TokenApi } from "../api/coin-api";
+import { PairApi } from "../api/pair-api";
+import { PmcjApi } from "../api/pmcj-api";
+import { Style } from './Style';
 
 export const DropDownPicker = () => {
     const dispatch = useDispatch();
@@ -22,49 +25,51 @@ export const DropDownPicker = () => {
             dispatch(calculatorSlice.actions.setSelectedPool(null as any));
         }
         else {
-            PMCJ_API.fetchPoolInfo(Number(event.target.value)).then(value => {
+            // fetch pool contract
+            PmcjApi.fetchPoolInfo(Number(event.target.value)).then(value => {
                     dispatch(calculatorSlice.actions.setSelectedPool(JSON.stringify(value)))
                     const lpToken = value.lpToken;
-                    PAIR_API.fetchAll(value.lpToken).then(value => {
+                    // fetch and save pair contract
+                    PairApi.fetchAll(value.lpToken).then(value => {
                         dispatch(calculatorSlice.actions.setPair(JSON.stringify(value)));
-                        COIN_API.getCoinInfos(lpToken, value.token0, value.token1).then( value => {
+                        // fetch and save token contracts
+                        TokenApi.getTokenInfo(lpToken, value.token0, value.token1).then( value => {
                             dispatch(calculatorSlice.actions.setTokens(value));
                         });
-                        // console.log(farm)
-                        const [farm1, farm2] = FARMS[event.target.value];
-                        TOKEN_ORACLE_API.getTokenPriceInUSD(farm1).then(value => {dispatch(calculatorSlice.actions.setOracleToken0(Number(value)))});
-                        TOKEN_ORACLE_API.getTokenPriceInUSD(farm2).then(value => {dispatch(calculatorSlice.actions.setOracleToken1(Number(value)))});
+                        const [farm0, farm1] = FARMS[event.target.value];
+                        // fetch and save price for token
+                        TokenOracleApi.getTokenPriceInUSD(farm0).then(value => {dispatch(calculatorSlice.actions.setOracleToken0(Number(value)))});
+                        TokenOracleApi.getTokenPriceInUSD(farm1).then(value => {dispatch(calculatorSlice.actions.setOracleToken1(Number(value)))});
                     });
                   }
               );
         }
     };
 
-    const renderMenuItems = () => {
-        const options = [<MenuItem value={-1}> Select a farm </MenuItem>];
-        for (let i = 0; i < FARMS.length; i++) {
-            const [farm1, farm2] = FARMS[i];
-            options.push(<MenuItem value={i.toString()}> {farm1} - {farm2} </MenuItem>)
-        }
-        return options;
-    }
-
     return (
         <Box sx={{ minWidth: 120 }}>
             <Typography variant="h6" align='left' component="h4" sx={{ marginTop: '1vh' }}> Farm </Typography>
             <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">farm</InputLabel>
                 <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
+                    displayEmpty
+                    labelId="simple-select-label"
+                    id="simple-select"
                     value={farm}
-                    label="farm"
                     onChange={handleChange}
+                    sx={Style.input}
                 >
                     {renderMenuItems().map((element => element))}
                 </Select>
             </FormControl>
-            <LiquidityAddInput />
         </Box>
     );
+}
+
+const renderMenuItems = () => {
+    const options = [<MenuItem disabled value={-1}> Select a farm </MenuItem>];
+    for (let i = 0; i < FARMS.length; i++) {
+        const [farm1, farm2] = FARMS[i];
+        options.push(<MenuItem value={i.toString()}> {farm1} - {farm2} </MenuItem>)
+    }
+    return options;
 }

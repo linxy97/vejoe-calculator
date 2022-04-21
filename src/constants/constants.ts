@@ -20,11 +20,6 @@ export const FARMS = [
     ['AVAX', 'USDT'],
 ]
 
-export const SECOND_TO_ANNUALIZE = (n: number) => n * 3600 * 24 * 365
-export const SECOND_TO_DAY = (n: number) => n * 3600 * 24
-
-export const DECIMALS_POW = (input: any) => Math.pow(10, Number(input));
-
 export const PRICE_ORACLE_ADDRESS = {
     'AVAX': {
         address: '0xff3eeb22b5e3de6e705b44749c2559d704923fd7',
@@ -67,3 +62,5 @@ export const PRICE_ORACLE_ADDRESS = {
         abi: CHAINLINK_TOKEN_ORACLE
     }
 }
+
+export const JOE_IMAGE_URL = 'https://764859236-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MYTkRFOHO4K48zVLh8x-2910905616%2Fuploads%2Fnmig5ugrL2w35GGpD3BN%2FTraderJoeVoxelBlack.png?alt=media&token=235013af-86d4-4480-831a-80a167c671a3';
