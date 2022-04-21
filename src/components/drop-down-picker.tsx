@@ -52,7 +52,7 @@ export const DropDownPicker = () => {
             <FormControl fullWidth>
                 <Select
                     displayEmpty
-                    labelId="simple-select-label"
+                    labelId="drop-down"
                     id="simple-select"
                     value={farm}
                     onChange={handleChange}

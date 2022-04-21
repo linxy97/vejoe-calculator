@@ -16,7 +16,7 @@ type stateType = {
     oracleTokenJoe: any,
 }
 
-const initialState: stateType = {
+export const initialState: stateType = {
     farm: -1,
     userLiquidity: null,
     joePerSec: null,
